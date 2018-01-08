@@ -2,6 +2,8 @@ import Sequelize from 'sequelize';
 
 const sequelize = new Sequelize('slack', 'postgres', '1234', {
     dialect: 'postgres',
+    // convert all our columns to underscore to using snack case ex. teamId => team_id
+    underscored: true
 });
 
 const models = {

@@ -25,7 +25,10 @@ app.use('/graphiql', graphiqlExpress({ endpointURL: graphqlEndpoint }));
 
 // Start the server
 const PORT = 3000;
-models.sequelize.sync().then(x => {
+models.sequelize.sync({
+    // drop database
+    force: true
+}).then(x => {
         app.listen(PORT, () => {
             console.log(`Go to http://localhost:${PORT}/graphiql to run queries!`);
         });
