@@ -1,10 +1,13 @@
+import path from 'path';
 import express from 'express';
 import bodyParser from 'body-parser';
 import { graphqlExpress, graphiqlExpress } from 'apollo-server-express';
 import { makeExecutableSchema } from 'graphql-tools';
-import typeDefs from './schema';
-import resolvers from './resolvers';
+import { fileLoader, mergeTypes, mergeResolvers } from 'merge-graphql-schemas';
 import models from './models';
+
+const typeDefs = mergeTypes(fileLoader(path.join(__dirname, './schema')));
+const resolvers = mergeResolvers(fileLoader(path.join(__dirname, './resolvers')));
 
 // Put together a schema
 const schema = makeExecutableSchema({
@@ -18,7 +21,7 @@ const app = express();
 // The GraphQL endpoint
 const graphqlEndpoint= '/graphql';
 
-app.use(graphqlEndpoint, bodyParser.json(), graphqlExpress({ schema }));
+app.use(graphqlEndpoint, bodyParser.json(), graphqlExpress({ schema, context: { models } }));
 
 // GraphiQL, a visual editor for queries
 app.use('/graphiql', graphiqlExpress({ endpointURL: graphqlEndpoint }));
@@ -27,7 +30,7 @@ app.use('/graphiql', graphiqlExpress({ endpointURL: graphqlEndpoint }));
 const PORT = 3000;
 models.sequelize.sync({
     // drop database
-    force: true
+    // force: true
 }).then(x => {
         app.listen(PORT, () => {
             console.log(`Go to http://localhost:${PORT}/graphiql to run queries!`);
