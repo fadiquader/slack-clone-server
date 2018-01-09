@@ -4,6 +4,7 @@ import bodyParser from 'body-parser';
 import { graphqlExpress, graphiqlExpress } from 'apollo-server-express';
 import { makeExecutableSchema } from 'graphql-tools';
 import { fileLoader, mergeTypes, mergeResolvers } from 'merge-graphql-schemas';
+import cors from 'cors';
 import models from './models';
 
 const typeDefs = mergeTypes(fileLoader(path.join(__dirname, './schema')));
@@ -17,7 +18,7 @@ const schema = makeExecutableSchema({
 
 // Initialize the app
 const app = express();
-
+app.use(cors('localhost:3000'))
 // The GraphQL endpoint
 const graphqlEndpoint= '/graphql';
 
@@ -29,7 +30,7 @@ app.use(graphqlEndpoint,
 app.use('/graphiql', graphiqlExpress({ endpointURL: graphqlEndpoint }));
 
 // Start the server
-const PORT = 3000;
+const PORT = 3001;
 models.sequelize.sync({
     // drop database
     // force: true
