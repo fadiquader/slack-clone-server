@@ -30,6 +30,37 @@ export default {
                 };
             }
         }),
+        addTeamMember: requiresAuth.createResolver(async (parent, { email, teamId }, { models, user }) => {
+            try {
+                // const owner = await models.User.findOne({ where: { id: user.id }}, { raw: true });
+                const [team, userToAdd] = await Promise.all([
+                    models.Team.findOne({ where: { id: teamId }}, { raw: true }),
+                    models.User.findOne({ where: { email } }, { raw: true })
+                ]);
+                if(user.id != team.owner) throw new Error('not owner');
+                else if(!userToAdd) throw new Error('no user');
+                await models.Member.create({ userId: userToAdd.id, teamId });
+                return {
+                    ok: true,
+                };
+            } catch (err) {
+                let errors = [];
+                switch (err.message) {
+                    case 'not owner':
+                        errors.push({ path: 'email', message: `You can't add member to the team`})
+                        break;
+                    case 'no user':
+                        errors.push({ path: 'email', message: `couldn't find user with this email.`})
+                        break;
+                    default:
+                        errors = formatErrors(err, models);
+                }
+                return {
+                    ok: false,
+                    errors
+                };
+            }
+        }),
     },
     Team: {
         channels: ({ id }, args, { models, user }) => {
