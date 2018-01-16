@@ -2,40 +2,20 @@ import formatErrors from '../formatErrors';
 import requiresAuth from '../permissions';
 
 export default {
-    Query: {
-        allTeams: requiresAuth.createResolver(async (parent, args, { models, user }) => {
-            // const teams = await models.Team.findAll({ owner: user.id }, { raw: true })
-            return models.Team.findAll({ owner: user.id }, { raw: true })
-        }),
-        inviteTeams: requiresAuth.createResolver(async (parent, args, { models, user }) => {
-            return models.sequelize.query(
-                `
-                SELECT * FROM teams JOIN members ON id=team_id WHERE user_id=${user.id} 
-                `,
-                { model: models.Team })
-            // return models.Team.findAll(
-            //     {
-            //         include: [
-            //             {
-            //                 model: models.User,
-            //                 where: { id: user.id },
-            //             },
-            //         ],
-            //     },
-            //     { raw: true },
-            // )
-        }),
-    },
+    // Query: {
+    //
+    // },
     Mutation: {
         createTeam: requiresAuth.createResolver(async (parent, args, { models, user }) => {
             try {
                 const response = await models.sequelize.transaction(async () => {
-                    const team = await models.Team.create({ ...args, owner: user.id });
+                    const team = await models.Team.create({ ...args });
                     const channel = await models.Channel.create({
                         name: 'general',
                         public: true,
                         teamId: team.id
                     });
+                    await models.Member.create({ teamId: team.id, userId: user.id, admin: true })
                     return team;
                 });
 
@@ -54,11 +34,11 @@ export default {
         addTeamMember: requiresAuth.createResolver(async (parent, { email, teamId }, { models, user }) => {
             try {
                 // const owner = await models.User.findOne({ where: { id: user.id }}, { raw: true });
-                const [team, userToAdd] = await Promise.all([
-                    models.Team.findOne({ where: { id: teamId }}, { raw: true }),
+                const [member, userToAdd] = await Promise.all([
+                    models.Member.findOne({ where: { teamId, userId: user.id }}, { raw: true }),
                     models.User.findOne({ where: { email } }, { raw: true })
                 ]);
-                if(user.id != team.owner) throw new Error('not owner');
+                if(!member.admin) throw new Error('not owner');
                 else if(!userToAdd) throw new Error('no user');
                 await models.Member.create({ userId: userToAdd.id, teamId });
                 return {
