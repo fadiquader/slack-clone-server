@@ -3,6 +3,7 @@ export default `
     id: Int!
     name: String!
     members: [User!]!
+    directMessageMembers: [User!]!
     channels: [Channel!]!
     admin: Boolean!
   }
@@ -21,6 +22,7 @@ export default `
   type Query {
     allTeams: [Team!]
     inviteTeams: [Team!]
+    getTeamMembers(teamId: Int!): [User!]!
   }
   
   type Mutation {
