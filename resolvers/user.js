@@ -14,6 +14,9 @@ export default {
     Query: {
         me: requiresAuth.createResolver(async (parent, args, { models, user }) => {
             return models.User.findOne({ where: { id: user.id } })
+        }),
+        getUser: requiresAuth.createResolver(async (parent, args, { models, user }) => {
+            return models.User.findOne({ where: { id: args.userId }})
         })
         ,
         allUsers: (parent, args, { models }) => models.User.findAll(),
