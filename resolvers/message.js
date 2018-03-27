@@ -15,6 +15,7 @@ export default {
         },
     },
     Message: {
+      url: parent => parent.url ? `//localhost:3001/${parent.url}` : null ,
         user: ({ user, userId }, args, { models }) => {
             if(user) return user;
             return models.User.findOne({ where: { id: userId } })
@@ -29,10 +30,15 @@ export default {
         })
     },
     Mutation: {
-        createMessage: async (parent, args, { models, user }) => {
+        createMessage: async (parent, { file, ...args }, { models, user }) => {
             try {
+              const messageData = args;
+              if(file) {
+                messageData.filetype = file.type,
+                messageData.url = file.path
+              }
                 const message = await models.Message.create({
-                    ...args,
+                    ...messageData,
                     userId: user.id,
                 });
 

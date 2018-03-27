@@ -8,6 +8,7 @@ import cors from 'cors';
 import jwt from 'jsonwebtoken';
 import { createServer } from 'http';
 import { execute, subscribe } from 'graphql';
+import formidable from 'formidable';
 // import { PubSub } from 'graphql-subscriptions';
 import { SubscriptionServer } from 'subscriptions-transport-ws';
 
@@ -53,11 +54,45 @@ const addUser = async (req, res, next) => {
 
 app.use(addUser);
 
+const uploadDir = 'files';
+
+const fileMiddleware = (req, res, next) => {
+  if (!req.is('multipart/form-data')) {
+    return next();
+  }
+
+  const form = formidable.IncomingForm({
+    uploadDir,
+  });
+
+  form.parse(req, (error, { operations }, files) => {
+    if (error) {
+      console.log(error);
+    }
+
+    const document = JSON.parse(operations);
+
+    if (Object.keys(files).length) {
+      const { file: { type, path: filePath } } = files;
+      console.log(type);
+      console.log(filePath);
+      document.variables.file = {
+        type,
+        path: filePath,
+      };
+    }
+
+    req.body = document;
+    next();
+  });
+};
+
 // The GraphQL endpoint
 const graphqlEndpoint= '/graphql';
 
 app.use(graphqlEndpoint,
     bodyParser.json(),
+    fileMiddleware,
     graphqlExpress(req => ({
         schema,
         context: {
@@ -72,6 +107,8 @@ app.use('/graphiql', graphiqlExpress({
     endpointURL: graphqlEndpoint,
     subscriptionsEndpoint: 'ws://localhost:3001/subscriptions'
 }));
+
+app.use('/files', express.static('files'))
 
 const server = createServer(app);
 // Start the server
