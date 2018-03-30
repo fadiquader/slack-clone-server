@@ -12,7 +12,7 @@ export default `
   }
   
   type Query {
-    directMessages(offset: Int!, teamId: Int!, otherUserId: Int!): [DirectMessage!]!
+    directMessages(cursor: String, teamId: Int!, otherUserId: Int!): [DirectMessage!]!
   }
   
   type Mutation {

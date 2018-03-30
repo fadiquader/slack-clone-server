@@ -1,6 +1,15 @@
 export default (sequelize, DataTypes) => {
     const DirectMessage = sequelize.define('direct_message', {
-        text: DataTypes.STRING,
+      text: DataTypes.STRING,
+      // url: DataTypes.STRING,
+      // filetype: DataTypes.STRING,
+    }, {
+      indexes: [
+        {
+          // unique: true,
+          fields: ['created_at']
+        }
+      ]
     });
 
     DirectMessage.associate = (models) => {

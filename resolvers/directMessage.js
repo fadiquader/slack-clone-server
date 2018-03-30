@@ -29,22 +29,25 @@ export default {
         },
     },
     Query: {
-        directMessages: requiresAuth.createResolver(async (parent, { offset, teamId, otherUserId }, { models, user }) => {
-            return models.DirectMessage.findAll({
-              order: [['created_at', 'DESC']],
-              where: {
-                teamId, [models.sequelize.Op.or]: [
-                  {
-                    [models.sequelize.Op.and]: [{ receiverId: otherUserId, }, { senderId: user.id }]
-                  }, {
-                    [models.sequelize.Op.and]: [{ receiverId:  user.id, }, { senderId: otherUserId }]
-                  }
-                ]},
-              limit: 10,
-              offset
-            }, {
-              raw: true
-            },);
+        directMessages: requiresAuth.createResolver(async (parent, { cursor, teamId, otherUserId }, { models, user }) => {
+          const options = {
+            order: [['created_at', 'DESC']],
+            where: {
+              teamId, [models.op.or]: [{
+                [models.op.and]: [{ receiverId: otherUserId, }, { senderId: user.id }]
+              }, {
+                [models.op.and]: [{ receiverId:  user.id, }, { senderId: otherUserId }]
+              }]
+            },
+            limit: 10,
+          };
+          console.log('cursor: ', cursor)
+          if (cursor) {
+            options.where.created_at = {
+              [models.op.lt]: cursor,
+            };
+          }
+          return models.DirectMessage.findAll({ options }, { raw: true },);
         })
     },
     Mutation: {
