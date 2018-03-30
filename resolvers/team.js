@@ -72,10 +72,8 @@ export default {
         }),
     },
     Team: {
-        channels: ({ id }, args, { models, user }) => {
-            return models.Channel.findAll({ where: { teamId: id } })
-        },
-        directMessageMembers: ({ id }, args, { models, user }) => {
+      channels: ({ id }, args, { channelLoader }) => channelLoader.load(id),
+      directMessageMembers: ({ id }, args, { models, user }) => {
             // distinct => we don't multipe users with same id
             return models.sequelize.query(`select distinct on (u.id) u.id, u.username from users as u join direct_messages as dm on (u.id=dm.receiver_id) where (:currentUserId=dm.sender_id or :currentUserId=dm.sender_id) and dm.team_id=:teamId`, {
                 replacements: { currentUserId: user.id, teamId: id },

@@ -9,6 +9,8 @@ import jwt from 'jsonwebtoken';
 import { createServer } from 'http';
 import { execute, subscribe } from 'graphql';
 import formidable from 'formidable';
+import DataLoader from 'dataloader';
+
 // import { PubSub } from 'graphql-subscriptions';
 import { SubscriptionServer } from 'subscriptions-transport-ws';
 
@@ -98,7 +100,9 @@ app.use(graphqlEndpoint,
         context: {
             models: models,
             user: req.user,
-            SECRET, SECRET2
+            SECRET, SECRET2,
+          channelLoader: new DataLoader(ids => channelBatcher(ids, models, req.user)),
+
         }})
     ));
 
