@@ -29,18 +29,22 @@ export default {
         },
     },
     Query: {
-        directMessages: requiresAuth.createResolver(async (parent, { teamId, otherUserId }, { models, user }) => {
-            return models.DirectMessage.findAll(
-                { order: [['created_at', 'ASC']],
-                    where: { teamId, [models.sequelize.Op.or]: [
-                        {
-                            [models.sequelize.Op.and]: [{ receiverId: otherUserId, }, { senderId: user.id }]
-                        }, {
-                            [models.sequelize.Op.and]: [{ receiverId:  user.id, }, { senderId: otherUserId }]
-                        }
-                    ]}},
-                { raw: true },
-            );
+        directMessages: requiresAuth.createResolver(async (parent, { offset, teamId, otherUserId }, { models, user }) => {
+            return models.DirectMessage.findAll({
+              order: [['created_at', 'DESC']],
+              where: {
+                teamId, [models.sequelize.Op.or]: [
+                  {
+                    [models.sequelize.Op.and]: [{ receiverId: otherUserId, }, { senderId: user.id }]
+                  }, {
+                    [models.sequelize.Op.and]: [{ receiverId:  user.id, }, { senderId: otherUserId }]
+                  }
+                ]},
+              limit: 10,
+              offset
+            }, {
+              raw: true
+            },);
         })
     },
     Mutation: {
