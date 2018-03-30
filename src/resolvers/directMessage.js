@@ -5,7 +5,7 @@ import requiresAuth, {
     requiresTeamAccess,
     directMessageSubscriptions
 } from '../permissions';
-import pubSub from '../pubsub'
+import pubSub from '../pubSub'
 
 const NEW_DIRECT_MESSAGE = 'NEW_DIRECT_MESSAGE';
 

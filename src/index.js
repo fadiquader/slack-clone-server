@@ -14,7 +14,7 @@ import DataLoader from 'dataloader';
 // import { PubSub } from 'graphql-subscriptions';
 import { SubscriptionServer } from 'subscriptions-transport-ws';
 
-import models from './models';
+import models from './models/index';
 import { refreshTokens } from './auth';
 
 const SECRET = "fadiqua";
@@ -98,11 +98,11 @@ app.use(graphqlEndpoint,
     graphqlExpress(req => ({
         schema,
         context: {
-            models: models,
-            user: req.user,
-            SECRET, SECRET2,
+          models: models,
+          user: req.user,
+          SECRET, SECRET2,
           channelLoader: new DataLoader(ids => channelBatcher(ids, models, req.user)),
-
+          serverUrl: `${req.protocol}://${req.get('host')}`,
         }})
     ));
 

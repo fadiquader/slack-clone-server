@@ -15,7 +15,7 @@ export default {
         },
     },
     Message: {
-      url: parent => parent.url ? `//localhost:3001/${parent.url}` : null ,
+      url: (parent, args, { serverUrl }) => `${serverUrl}/${parent.url}`,
         user: ({ user, userId }, args, { models }) => {
             if(user) return user;
             return models.User.findOne({ where: { id: userId } })
