@@ -9,7 +9,7 @@
 /build
 /files/*
 .idea
-
+pgdata
 # misc
 .DS_Store
 .env.local

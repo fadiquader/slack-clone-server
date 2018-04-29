@@ -1,12 +1,16 @@
 import Sequelize from 'sequelize';
 
-const sequelize = new Sequelize(process.env.TEST_DB || 'slack', 'postgres', '1234', {
-    dialect: 'postgres',
-    operatorsAliases: Sequelize.Op,
-    define: {
-        // convert all our columns to underscore to using snack case ex. teamId => team_id
-        underscored: true
-    }
+const sequelize = new Sequelize(process.env.TEST_DB || 'slack',
+  'postgres',
+  process.env.POSTGRES_PASSWORD || '1234',
+  {
+  dialect: 'postgres',
+  operatorsAliases: Sequelize.Op,
+  host: process.env.DB_HOST || 'localhost',
+  define: {
+    // convert all our columns to underscore to using snack case ex. teamId => team_id
+    underscored: true
+  }
 });
 
 const models = {
