@@ -15,7 +15,7 @@ export default {
         },
     },
     Message: {
-      url: (parent, args, { serverUrl }) => `${serverUrl}/${parent.url}`,
+      url: (parent, args, { serverUrl }) => `${process.env.SERVER_URL || 'http://localhost:3001'}/${parent.url}`,
         user: ({ user, userId }, args, { models }) => {
             if(user) return user;
             return models.User.findOne({ where: { id: userId } })
