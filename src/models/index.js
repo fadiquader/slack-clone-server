@@ -5,7 +5,8 @@ const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 export default async () => {
   let maxReconnects = 20;
   let connected = false;
-  let sequelize = new Sequelize(process.env.TEST_DB || 'slack',
+  const sequelize = new Sequelize(
+    process.env.TEST_DB || 'slack',
     'postgres',
     process.env.POSTGRES_PASSWORD || 'postgres',
     {
@@ -14,13 +15,14 @@ export default async () => {
       host: process.env.DB_HOST || 'localhost',
       define: {
         // convert all our columns to underscore to using snack case ex. teamId => team_id
-        underscored: true
-      }
-    });
+        underscored: true,
+      },
+    },
+  );
 
   while (!connected && maxReconnects) {
     try {
-      await sequelize.authenticate()
+      await sequelize.authenticate();
       connected = true;
     } catch (err) {
       console.log('reconnecting in 5 seconds: ', err.message);
@@ -54,5 +56,5 @@ export default async () => {
   models.op = Sequelize.Op;
 
   return models;
-}
+};
 
