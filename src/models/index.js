@@ -7,7 +7,7 @@ export default async () => {
   let connected = false;
   let sequelize = new Sequelize(process.env.TEST_DB || 'slack',
     'postgres',
-    process.env.POSTGRES_PASSWORD || '1234',
+    process.env.POSTGRES_PASSWORD || 'postgres',
     {
       dialect: 'postgres',
       operatorsAliases: Sequelize.Op,
@@ -23,7 +23,7 @@ export default async () => {
       await sequelize.authenticate()
       connected = true;
     } catch (err) {
-      console.log('reconnecting in 5 seconds');
+      console.log('reconnecting in 5 seconds: ', err.message);
       // eslint-disable-next-line no-await-in-loop
       await sleep(5000);
       maxReconnects -= 1;

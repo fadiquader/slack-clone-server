@@ -11,15 +11,15 @@ services:
     networks:
       - webnet
     environment:
-      POSTGRES_PASSWORD: 1234
+      POSTGRES_PASSWORD: postgres
       POSTGRES_USER: postgres
       POSTGRES_DB: slack
     ports:
-      - "3030:5432"
+      - "5432:5432"
   web:
     image: slack-clone-server
-    ports:
-      - "3001:3001"
+#    ports:
+#      - "3001:3001"
     networks:
       - webnet
     environment:
@@ -27,6 +27,8 @@ services:
       REDIS_HOST: redis
     volumes:
       - ./files:/app/files
+    links:
+        - db
     depends_on:
       - db
       - redis
@@ -38,7 +40,7 @@ services:
       - ./mysite.template:/etc/nginx/conf.d/mysite.template
       - ./files:/files
     ports:
-      - "8081:80"
+      - "3001:80"
     networks:
       - webnet
     depends_on:

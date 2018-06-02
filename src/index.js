@@ -123,7 +123,7 @@ getModels().then((models) => {
 // GraphiQL, a visual editor for queries
   app.use('/graphiql', graphiqlExpress({
     endpointURL: graphqlEndpoint,
-    subscriptionsEndpoint: 'ws://localhost:3001/subscriptions'
+    subscriptionsEndpoint: `ws://localhost:${PORT}/subscriptions`
   }));
 
   models.sequelize.sync({
